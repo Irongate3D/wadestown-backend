@@ -1993,7 +1993,7 @@
   resolved "https://registry.npmjs.org/@medusajs/customer/-/customer-2.8.3.tgz"
   integrity sha512-wsNmWrrhjtkuq+30RvoiEpVo54+R1Ws2gu48hw386N3iO41T+tzcOtYuJsSl+FJ414F14htNK/dNDxQ4MgBf9Q==
 
-"@medusajs/dashboard@2.8.3":
+"@medusajs/dashboard@^2.8.3", "@medusajs/dashboard@2.8.3":
   version "2.8.3"
   resolved "https://registry.npmjs.org/@medusajs/dashboard/-/dashboard-2.8.3.tgz"
   integrity sha512-pKamDF4SUDqZJ6qt9WDkROVjbHcoMcQX3HtnywQf6Lxbtzgt3mgF0HtYUQckwToggl9ELjnymThes4uK8kfLyw==
