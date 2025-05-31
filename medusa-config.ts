@@ -13,5 +13,4 @@ export default defineConfig({
       cookieSecret: process.env.COOKIE_SECRET || "supersecret",
     },
   },
-  // Removed the modules section to prevent duplicate registration
 })

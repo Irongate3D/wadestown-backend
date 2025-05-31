@@ -1940,7 +1940,7 @@
   resolved "https://registry.npmjs.org/@medusajs/cache-inmemory/-/cache-inmemory-2.8.3.tgz"
   integrity sha512-aPmgbWIxcyC1/6a3RLxEVAH0kXlDLoVJE07ZBWTfbc0Zl7IJgc/KJxF/4bnkvKEj8GKvRDDAavY+kVMpWuYbYg==
 
-"@medusajs/cache-redis@2.8.3":
+"@medusajs/cache-redis@^2.8.3", "@medusajs/cache-redis@2.8.3":
   version "2.8.3"
   resolved "https://registry.npmjs.org/@medusajs/cache-redis/-/cache-redis-2.8.3.tgz"
   integrity sha512-CKwkGF4g7ba50m48vYOoaFyuWp9sIuBMVczw64v64Exupz4RhFJ6j9bA9luP8G/ndyxBsc6/CBVC9bGj9iqMmA==
@@ -2047,7 +2047,7 @@
   dependencies:
     ulid "^2.3.0"
 
-"@medusajs/event-bus-redis@2.8.3":
+"@medusajs/event-bus-redis@^2.8.3", "@medusajs/event-bus-redis@2.8.3":
   version "2.8.3"
   resolved "https://registry.npmjs.org/@medusajs/event-bus-redis/-/event-bus-redis-2.8.3.tgz"
   integrity sha512-96w2OSMF1K+FJsMW70x0eGGdOuVPngIazbXkGqUYq1Yc0ewQ3KNTzzhyC3E3qHHfyN64t7d45WF97t8wRN+e9w==
@@ -2074,7 +2074,7 @@
   resolved "https://registry.npmjs.org/@medusajs/file/-/file-2.8.3.tgz"
   integrity sha512-esyJ+uUzLWzDlREydizNESBQbCTtbKGUX3MFJO1ZpSxSqSO2NxgLiIrWr9yUoCYYPX1iqSdd7bZe+MwwjreUfw==
 
-"@medusajs/framework@2.8.3":
+"@medusajs/framework@^2.8.3", "@medusajs/framework@2.8.3":
   version "2.8.3"
   resolved "https://registry.npmjs.org/@medusajs/framework/-/framework-2.8.3.tgz"
   integrity sha512-SdnQ1RcC30E5fW0nwnik+7t5FyLStJZdUk9W4jc37ZzxpzutDLYEcFhL8T0psLuxu5k6gl10CtBK/CIA/VhwLQ==
@@ -2159,7 +2159,7 @@
   resolved "https://registry.npmjs.org/@medusajs/locking/-/locking-2.8.3.tgz"
   integrity sha512-j4vC657ySVqJ0o2jRXCIAaaFne+UIocU7fkx60A/bm5JkDpmFMWhea0ZVjcdL1hdU9Wv+iqeeiLcuTitQb/CJg==
 
-"@medusajs/medusa@2.8.3":
+"@medusajs/medusa@^2.8.3", "@medusajs/medusa@2.8.3":
   version "2.8.3"
   resolved "https://registry.npmjs.org/@medusajs/medusa/-/medusa-2.8.3.tgz"
   integrity sha512-FH5K2u7Uvs0Il5Sb46wBCt1y0Ik6w7OrLq0gYm8n+wav54w7ZAIzG3et3Ry7fuBamDN3PPJpRNgqIY1p7wPNzQ==
@@ -2229,7 +2229,7 @@
     uuid "^9.0.0"
     zod "3.22.4"
 
-"@medusajs/modules-sdk@2.8.3":
+"@medusajs/modules-sdk@^2.8.3", "@medusajs/modules-sdk@2.8.3":
   version "2.8.3"
   resolved "https://registry.npmjs.org/@medusajs/modules-sdk/-/modules-sdk-2.8.3.tgz"
   integrity sha512-wPFQ/i4nrsYCX+KiLePlOeBVvv2WeTh+N4Th1P0jTB/Dv3nRwuUXlWtm58sPT1l/aGt4zqdSwtiFvehwQWVSNQ==
@@ -2348,7 +2348,7 @@
     get-port "^5.1.0"
     randomatic "^3.1.1"
 
-"@medusajs/types@2.8.3":
+"@medusajs/types@^2.8.3", "@medusajs/types@2.8.3":
   version "2.8.3"
   resolved "https://registry.npmjs.org/@medusajs/types/-/types-2.8.3.tgz"
   integrity sha512-VCgoyYM9yMY9U7EcejerhniVzG0+ZETQhi30Ho8ifrH+I0KnecB3i99vP2dD6pOzbPj7XrbK+KzItBi80o9yqQ==
@@ -2381,7 +2381,7 @@
   dependencies:
     jsonwebtoken "^9.0.2"
 
-"@medusajs/utils@2.8.3":
+"@medusajs/utils@^2.8.3", "@medusajs/utils@2.8.3":
   version "2.8.3"
   resolved "https://registry.npmjs.org/@medusajs/utils/-/utils-2.8.3.tgz"
   integrity sha512-kg9ztQZIWiRpqv8joetb3I28CUVeERIDOthHhm3PeeVeA6XVqXWRudLzHMkBh08w0deToGQuYA+3YeoiKR0d3w==
@@ -2410,7 +2410,7 @@
     cron-parser "^4.9.0"
     ulid "^2.3.0"
 
-"@medusajs/workflow-engine-redis@2.8.3":
+"@medusajs/workflow-engine-redis@^2.8.3", "@medusajs/workflow-engine-redis@2.8.3":
   version "2.8.3"
   resolved "https://registry.npmjs.org/@medusajs/workflow-engine-redis/-/workflow-engine-redis-2.8.3.tgz"
   integrity sha512-9xQiWE2jDCZ7WDCI+YglSYBnkxnH9Ul2IsYJJaUqKLVmxQRST0SYl8tGIhn1K9CgqlWe3LWVC46J6I6QvN/Jdw==
