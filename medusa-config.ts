@@ -13,12 +13,5 @@ export default defineConfig({
       cookieSecret: process.env.COOKIE_SECRET || "supersecret",
     },
   },
-  modules: {
-    stockLocation: {
-      resolve: "@medusajs/stock-location",
-      options: {
-        // Add any necessary configuration options here
-      },
-    },
-  },
+  // Removed the modules section to prevent duplicate registration
 })
