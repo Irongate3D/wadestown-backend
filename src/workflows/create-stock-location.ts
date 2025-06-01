@@ -1,25 +1,22 @@
-import { createWorkflow } from "@medusajs/workflows-sdk";
-import { createStockLocationsWorkflow } from "@medusajs/medusa/dist/core-flows";
+import { createStockLocationsWorkflow } from "@medusajs/core-flows";
+import { type AwilixContainer } from "awilix";
 
-export const createStockLocationWorkflow = createWorkflow(
-  "create-stock-location-workflow",
-  async (input, { container }) => {
-    const result = await createStockLocationsWorkflow.run(
-      {
-        locations: [
-          {
-            name: "Main Warehouse",
-            address: {
-              address_1: "123 Main St",
-              city: "Auckland",
-              country_code: "NZ",
-            },
+export async function runCreateStockLocation(container: AwilixContainer) {
+  const result = await createStockLocationsWorkflow.run(
+    {
+      locations: [
+        {
+          name: "Main Warehouse",
+          address: {
+            address_1: "123 Main St",
+            city: "Auckland",
+            country_code: "NZ",
           },
-        ],
-      },
-      { container }
-    );
+        },
+      ],
+    },
+    { container }
+  );
 
-    return result;
-  }
-);
+  return result;
+}

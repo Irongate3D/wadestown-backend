@@ -1,11 +1,15 @@
-import { createStockLocationWorkflow } from "../workflows/create-stock-location";
-import { getContainer } from "@medusajs/medusa/dist/loaders/container";
+import { runCreateStockLocation } from "../workflows/create-stock-location"
+import { getContainer } from "@medusajs/utils"
+import * as path from "path"
 
-(async () => {
-  const container = await getContainer();
+;(async () => {
+  const rootDir = path.resolve(__dirname, "../..")
 
-  const workflow = createStockLocationWorkflow();
-  const result = await workflow.run({}, { container });
+  const container = await getContainer({
+    directory: rootDir,
+    environment: process.env.NODE_ENV || "development",
+  })
 
-  console.log("Stock location created:", result);
-})();
+  const result = await runCreateStockLocation(container)
+  console.log("✅ Stock location created:", result)
+})()
