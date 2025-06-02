@@ -1,9 +1,9 @@
-import { createStockLocationsWorkflow } from "@medusajs/core-flows";
-import { type AwilixContainer } from "awilix";
+import { createStockLocationsWorkflow } from "@medusajs/core-flows"
+import { type MedusaContainer } from "@medusajs/types";
 
-export async function runCreateStockLocation(container: AwilixContainer) {
-  const result = await createStockLocationsWorkflow.run(
-    {
+export async function runCreateStockLocation(container: MedusaContainer) {
+  const result = await createStockLocationsWorkflow.run({
+    input: {
       locations: [
         {
           name: "Main Warehouse",
@@ -15,8 +15,8 @@ export async function runCreateStockLocation(container: AwilixContainer) {
         },
       ],
     },
-    { container }
-  );
+    container,
+  });
 
   return result;
 }
