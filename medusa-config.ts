@@ -1,6 +1,6 @@
-import { loadEnv, defineConfig } from '@medusajs/framework/utils'
+import { defineConfig, loadEnv } from '@medusajs/framework/utils'
 
-// Load environment variables
+// Load environment variables from .env
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
 export default defineConfig({
@@ -17,13 +17,21 @@ export default defineConfig({
   },
 
   modules: {
-    // ✅ Inventory module (includes stock locations)
+    // Inventory module: uses your Postgres database
     inventory: {
       resolve: '@medusajs/inventory',
       options: {
         database: {
           clientUrl: process.env.DATABASE_URL,
         },
+      },
+    },
+
+    // Stock Location module: requires Redis explicitly
+    stockLocation: {
+      resolve: '@medusajs/stock-location',
+      options: {
+        redisUrl: process.env.REDIS_URL,
       },
     },
   },
