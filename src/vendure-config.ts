@@ -62,18 +62,25 @@ export const config: VendureConfig = {
     // need to be updated. See the "Migrations" section in README.md.
     customFields: {},
     plugins: [
-        GraphiqlPlugin.init(),
+          // Development-only plugins
+        ...(IS_DEV ? [
+            GraphiqlPlugin.init()
+        ] : []),
+        
+        // Core production plugins
         AssetServerPlugin.init({
             route: 'assets',
             assetUploadDir: path.join(__dirname, '../static/assets'),
             // For local dev, the correct value for assetUrlPrefix should
             // be guessed correctly, but for production it will usually need
             // to be set manually to match your production url.
-            assetUrlPrefix: IS_DEV ? undefined : 'https://www.my-shop.com/assets/',
+            assetUrlPrefix: IS_DEV ? undefined : 'https://www.wadestown.co.nz/assets'
         }),
+        // Other core plugins
         DefaultSchedulerPlugin.init(),
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
-            DefaultSearchPlugin,
+        DefaultSearchPlugin,
+        
         EmailPlugin.init({
             outputPath: path.join(__dirname, '../static/email/test-emails'),
             route: 'mailbox',
@@ -88,26 +95,29 @@ export const config: VendureConfig = {
                     user: process.env.GMAIL_USER,
                     pass: process.env.GMAIL_PASSWORD,
                 },
-                logging: true,
-                debug: true,
+                logging: IS_DEV,
+                debug: IS_DEV,
             },                
             globalTemplateVars: {
                 // The following variables will change depending on your storefront implementation.
                 // Here we are assuming a storefront running at http://localhost:8080.
                 fromAddress: '"example" <noreply@example.com>',
-                verifyEmailAddressUrl: 'http://localhost:8080/verify',
-                passwordResetUrl: 'http://localhost:8080/password-reset',
-                changeEmailAddressUrl: 'http://localhost:8080/verify-email-address-change'
+                verifyEmailAddressUrl: 'http://www.wadestown.co.nz/verify',
+                passwordResetUrl: 'http://www.wadestown.co.nz/password-reset',
+                changeEmailAddressUrl: 'http://www.wadestown.co.nz/verify-email-address-change'
             },
         }),
+        // Payment plugins
         StripePlugin.init({
             storeCustomersInStripe: true,
         }),
+        // Security plugin (auto-tightens in production)
         HardenPlugin.init({
             maxQueryComplexity: 650,
-            logComplexityScore: true,
-            apiMode: process.env.APP_ENV === 'dev' ? 'dev' : 'prod',
+            logComplexityScore: IS_DEV,  // Only log in development
+            apiMode: IS_DEV ? 'dev' : 'prod',  // Auto-switches
         }),
+        // Admin UI (ensure port doesn't conflict)
         AdminUiPlugin.init({
             route: 'admin',
             port: serverPort + 2,

@@ -7,9 +7,10 @@
     "dev:worker": "ts-node ./src/index-worker.ts",
     "dev": "concurrently npm:dev:*",
     "build": "tsc",
+    "start": "pm2 start ./dist/index.js ./dist/index-worker.js --no-daemon",
     "start:server": "node ./dist/index.js",
     "start:worker": "node ./dist/index-worker.js",
-    "start": "concurrently npm:start:*"
+    "start:dev": "concurrently npm:dev:*"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^9.0.2",
@@ -25,11 +26,15 @@
     "mjml": "^4.15.3",
     "nodemailer": "^6.10.1",
     "pg": "8.16.0",
+    "pm2": "^6.0.8",
     "stripe": "^13.11.0"
   },
   "devDependencies": {
     "@vendure/cli": "3.3.3",
     "concurrently": "9.1.2",
     "typescript": "5.8.2"
+  },
+  "engines": {
+    "node": ">=24.2.0"
   }
 }
