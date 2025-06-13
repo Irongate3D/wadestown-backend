@@ -120,7 +120,7 @@ export const config: VendureConfig = {
         // Admin UI (ensure port doesn't conflict)
         AdminUiPlugin.init({
             route: 'admin',
-            port: serverPort + 2,
+            port: serverPort,
             adminUiConfig: {
                 apiPort: serverPort,
             },
