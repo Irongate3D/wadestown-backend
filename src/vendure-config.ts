@@ -22,6 +22,12 @@ export const config: VendureConfig = {
     apiOptions: {
         port: +(process.env.PORT || 3000),
         adminApiPath: 'admin-api',
+        cors: {
+            origin: process.env.APP_ENV === 'dev'
+                ? 'http://localhost:3000'
+                : 'https://www.wadestown.co.nz',
+            credentials: true  // Required if using cookies/sessions
+            },
         shopApiPath: 'shop-api',
         // The following options are useful in development mode,
         // but are best turned off for production for security
