@@ -3,96 +3,169 @@ import {
     DefaultJobQueuePlugin,
     DefaultSchedulerPlugin,
     VendureConfig,
-    DefaultSearchPlugin
+    DefaultSearchPlugin,
+    AssetStorageStrategy,
+    RequestContext,
 } from '@vendure/core';
-import { defaultEmailHandlers, EmailPlugin, FileBasedTemplateLoader } from '@vendure/email-plugin';
+import {
+    defaultEmailHandlers,
+    EmailPlugin,
+    FileBasedTemplateLoader,
+} from '@vendure/email-plugin';
 import { HardenPlugin } from '@vendure/harden-plugin';
 import { AssetServerPlugin } from '@vendure/asset-server-plugin';
+import { DefaultAssetNamingStrategy } from '@vendure/core';
 import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
 import { GraphiqlPlugin } from '@vendure/graphiql-plugin';
 import { StripePlugin } from '@vendure/payments-plugin/package/stripe';
-import 'dotenv/config';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { Readable } from 'stream';
 import path from 'path';
-
+import 'dotenv/config';
 
 const IS_DEV = process.env.APP_ENV === 'dev';
-const serverPort = +process.env.PORT || 3000;
+const serverPort = +(process.env.PORT || 3000);
 
+// ✅ Custom SupabaseAssetStorageStrategy
+export class SupabaseAssetStorageStrategy implements AssetStorageStrategy {
+    private client: SupabaseClient;
+    private bucketName = 'vendure-assets';
+
+    constructor(private supabaseUrl: string, private supabaseKey: string) {
+        this.client = createClient(supabaseUrl, supabaseKey);
+    }
+
+    async writeFileFromBuffer(fileName: string, data: Buffer): Promise<string> {
+        const { error } = await this.client.storage
+            .from(this.bucketName)
+            .upload(fileName, data, { upsert: true });
+
+        if (error) throw new Error(`Supabase upload failed: ${error.message}`);
+        return fileName;
+    }
+
+    async writeFileFromStream(fileName: string, stream: Readable): Promise<string> {
+        const chunks: Buffer[] = [];
+        for await (const chunk of stream) {
+            chunks.push(chunk);
+        }
+        const buffer = Buffer.concat(chunks);
+        return this.writeFileFromBuffer(fileName, buffer);
+    }
+
+    async readFileToBuffer(identifier: string): Promise<Buffer> {
+        const { data, error } = await this.client.storage
+            .from(this.bucketName)
+            .download(identifier);
+
+        if (error || !data) {
+            throw new Error(`Supabase download failed: ${error?.message}`);
+        }
+
+        return Buffer.from(await data.arrayBuffer());
+    }
+
+    async readFileToStream(identifier: string): Promise<Readable> {
+        const buffer = await this.readFileToBuffer(identifier);
+        return Readable.from(buffer);
+    }
+
+    async deleteFile(identifier: string): Promise<void> {
+        const { error } = await this.client.storage
+            .from(this.bucketName)
+            .remove([identifier]);
+
+        if (error) throw new Error(`Supabase delete failed: ${error.message}`);
+    }
+
+    async fileExists(fileName: string): Promise<boolean> {
+        const { data, error } = await this.client.storage
+            .from(this.bucketName)
+            .list('', { search: fileName });
+
+        if (error) return false;
+        return data?.some(file => file.name === fileName) ?? false;
+    }
+
+    toAbsoluteUrl(filePath: string): string {
+        return `${this.supabaseUrl}/storage/v1/object/public/${this.bucketName}/${filePath}`;
+    }
+}
+
+// ✅ Vendure config using Supabase
 export const config: VendureConfig = {
     apiOptions: {
         hostname: '0.0.0.0',
-        port: +(process.env.PORT || 3000),
+        port: serverPort,
         adminApiPath: 'admin-api',
+        shopApiPath: 'shop-api',
         cors: {
-            origin: process.env.APP_ENV === 'dev'
+            origin: IS_DEV
                 ? 'http://localhost:3000'
                 : 'https://www.wadestown.co.nz',
-            credentials: true  // Required if using cookies/sessions
-            },
-        shopApiPath: 'shop-api',
-        // The following options are useful in development mode,
-        // but are best turned off for production for security
-        // reasons.
+            credentials: true,
+        },
         ...(IS_DEV ? {
             adminApiDebug: true,
             shopApiDebug: true,
-        } : {}),
+        } : {})
     },
+
     authOptions: {
         tokenMethod: ['bearer', 'cookie'],
         superadminCredentials: {
-            identifier: process.env.SUPERADMIN_USERNAME,
-            password: process.env.SUPERADMIN_PASSWORD,
+            identifier: process.env.SUPERADMIN_USERNAME!,
+            password: process.env.SUPERADMIN_PASSWORD!,
         },
         cookieOptions: {
-          secret: process.env.COOKIE_SECRET,
+            secret: process.env.COOKIE_SECRET!,
         },
     },
+
     dbConnectionOptions: {
         type: 'postgres',
-        // See the README.md "Migrations" section for an explanation of
-        // the `synchronize` and `migrations` options.
         synchronize: false,
         migrations: [path.join(__dirname, './migrations/*.+(js|ts)')],
-        logging: false,
-        database: process.env.DB_NAME,
-        schema: process.env.DB_SCHEMA,
-        host: process.env.DB_HOST,
-        port: +process.env.DB_PORT,
-        username: process.env.DB_USERNAME,
-        password: process.env.DB_PASSWORD,
+        logging: IS_DEV,
+        database: process.env.DB_NAME!,
+        schema: process.env.DB_SCHEMA!,
+        host: process.env.DB_HOST!,
+        port: +(process.env.DB_PORT || 5432),
+        username: process.env.DB_USERNAME!,
+        password: process.env.DB_PASSWORD!,
     },
+
     paymentOptions: {
         paymentMethodHandlers: [dummyPaymentHandler],
     },
-    // When adding or altering custom field definitions, the database will
-    // need to be updated. See the "Migrations" section in README.md.
+
     customFields: {},
+
     plugins: [
-          // Development-only plugins
-        ...(IS_DEV ? [
-            GraphiqlPlugin.init()
-        ] : []),
-        
-        // Core production plugins
+        ...(IS_DEV ? [GraphiqlPlugin.init()] : []),
+
         AssetServerPlugin.init({
             route: 'assets',
-            assetUploadDir: path.join(__dirname, '../static/assets'),
-            // For local dev, the correct value for assetUrlPrefix should
-            // be guessed correctly, but for production it will usually need
-            // to be set manually to match your production url.
-            assetUrlPrefix: IS_DEV ? undefined : 'https://www.wadestown.co.nz/assets'
+            assetUploadDir: path.join(__dirname, 'assets'),
+            namingStrategy: new DefaultAssetNamingStrategy(),
+            storageStrategyFactory: () =>
+                new SupabaseAssetStorageStrategy(
+                    process.env.SUPABASE_URL!,
+                    process.env.SUPABASE_SECRET_KEY!
+                ),
         }),
-        // Other core plugins
+
         DefaultSchedulerPlugin.init(),
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
         DefaultSearchPlugin,
-        
+
         EmailPlugin.init({
             outputPath: path.join(__dirname, '../static/email/test-emails'),
             route: 'mailbox',
             handlers: defaultEmailHandlers,
-            templateLoader: new FileBasedTemplateLoader(path.join(__dirname, '../static/email/templates')),
+            templateLoader: new FileBasedTemplateLoader(
+                path.join(__dirname, '../static/email/templates')
+            ),
             transport: {
                 type: 'smtp',
                 host: 'smtp.gmail.com',
@@ -104,33 +177,31 @@ export const config: VendureConfig = {
                 },
                 logging: IS_DEV,
                 debug: IS_DEV,
-            },                
+            },
             globalTemplateVars: {
-                // The following variables will change depending on your storefront implementation.
-                // Here we are assuming a storefront running at http://localhost:8080.
-                fromAddress: '"example" <noreply@example.com>',
-                verifyEmailAddressUrl: 'http://www.wadestown.co.nz/verify',
-                passwordResetUrl: 'http://www.wadestown.co.nz/password-reset',
-                changeEmailAddressUrl: 'http://www.wadestown.co.nz/verify-email-address-change'
+                fromAddress: '"Wadestown" <noreply@wadestown.co.nz>',
+                verifyEmailAddressUrl: 'https://www.wadestown.co.nz/verify',
+                passwordResetUrl: 'https://www.wadestown.co.nz/password-reset',
+                changeEmailAddressUrl: 'https://www.wadestown.co.nz/verify-email-address-change',
             },
         }),
-        // Payment plugins
+
         StripePlugin.init({
             storeCustomersInStripe: true,
         }),
-        // Security plugin (auto-tightens in production)
+
         HardenPlugin.init({
             maxQueryComplexity: 650,
-            logComplexityScore: IS_DEV,  // Only log in development
-            apiMode: IS_DEV ? 'dev' : 'prod',  // Auto-switches
+            logComplexityScore: IS_DEV,
+            apiMode: IS_DEV ? 'dev' : 'prod',
         }),
-        // Admin UI (ensure port doesn't conflict)
+
         AdminUiPlugin.init({
             route: 'admin',
-            port: +(process.env.PORT || 3000), // Use same port as API
+            port: serverPort,
             hostname: '0.0.0.0',
             adminUiConfig: {
-                apiPort: +(process.env.PORT || 3000),
+                apiPort: serverPort,
             },
         }),
     ],

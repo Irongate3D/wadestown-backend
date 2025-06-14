@@ -13,8 +13,13 @@
     "start:dev": "concurrently npm:dev:*"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.828.0",
+    "@aws-sdk/credential-providers": "^3.828.0",
+    "@aws-sdk/lib-storage": "^3.828.0",
     "@elastic/elasticsearch": "^9.0.2",
     "@stripe/stripe-js": "^7.3.1",
+    "@supabase/storage-js": "^2.7.3",
+    "@supabase/supabase-js": "^2.50.0",
     "@vendure/admin-ui-plugin": "^3.3.3",
     "@vendure/asset-server-plugin": "^3.3.3",
     "@vendure/core": "3.3.3",
