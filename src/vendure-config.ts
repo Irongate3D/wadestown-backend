@@ -20,6 +20,7 @@ const serverPort = +process.env.PORT || 3000;
 
 export const config: VendureConfig = {
     apiOptions: {
+        hostname: '0.0.0.0',
         port: +(process.env.PORT || 3000),
         adminApiPath: 'admin-api',
         cors: {
@@ -126,9 +127,10 @@ export const config: VendureConfig = {
         // Admin UI (ensure port doesn't conflict)
         AdminUiPlugin.init({
             route: 'admin',
-            port: serverPort,
+            port: +(process.env.PORT || 3000), // Use same port as API
+            hostname: '0.0.0.0',
             adminUiConfig: {
-                apiPort: serverPort,
+                apiPort: +(process.env.PORT || 3000),
             },
         }),
     ],
