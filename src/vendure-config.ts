@@ -102,7 +102,7 @@ export const config: VendureConfig = {
         cors: {
             origin: IS_DEV
                 ? 'http://localhost:3000'
-                : 'https://www.wadestown.co.nz',
+                : 'https://wadestown-backend.onrender.com/admin',
             credentials: true,
         },
         ...(IS_DEV ? {
